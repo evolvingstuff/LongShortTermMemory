@@ -1,0 +1,3 @@
+This is an implementation of Long Short Term Memory in Java - see here for details: http://www.idsia.ch/~juergen/rnn.html
+
+Not very thoroughly tested or debugged at this point.
