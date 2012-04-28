@@ -2,8 +2,7 @@ package com.evolvingstuff;
 
 import java.util.*;
 
-public class LSTM implements IAgent, IAgentSupervised
-{
+public class LSTM implements IAgent, IAgentSupervised {
 	private double init_weight_range = 0.1;
 	private int full_input_dimension;
 	private int full_hidden_dimension;
@@ -37,18 +36,15 @@ public class LSTM implements IAgent, IAgentSupervised
 	
 	private double learningRate = 0.07;
 	
-	public double[] GetHiddenState()
-	{
+	public double[] GetHiddenState() {
 		return context.clone();
 	}
 	
-	public void SetHiddenState(double[] new_state)
-	{
+	public void SetHiddenState(double[] new_state) {
 		context = new_state.clone();
 	}
 	
-	public LSTM(Random r, int input_dimension, int output_dimension, int cell_blocks)
-	{
+	public LSTM(Random r, int input_dimension, int output_dimension, int cell_blocks) {
 		this.output_dimension = output_dimension;
 		this.cell_blocks = cell_blocks;
 		
@@ -74,10 +70,8 @@ public class LSTM implements IAgent, IAgentSupervised
 		
 		weightsOutputGate = new double[cell_blocks][full_input_dimension];
 		
-		for (int i = 0; i < full_input_dimension; i++)
-		{
-			for (int j = 0; j < cell_blocks; j++)
-			{
+		for (int i = 0; i < full_input_dimension; i++) {
+			for (int j = 0; j < cell_blocks; j++) {
 				weightsNetInput[j][i] = (r.nextDouble() * 2 - 1) * init_weight_range;
 				weightsInputGate[j][i] = (r.nextDouble() * 2 - 1) * init_weight_range;
 				weightsForgetGate[j][i] = (r.nextDouble() * 2 - 1) * init_weight_range;
@@ -85,8 +79,7 @@ public class LSTM implements IAgent, IAgentSupervised
 			}
 		}
 		
-		for (int j = 0; j < cell_blocks; j++)
-		{
+		for (int j = 0; j < cell_blocks; j++) {
 			weightsInputGate[j][full_input_dimension-1] += biasInputGate;
 			weightsForgetGate[j][full_input_dimension-1] += biasForgetGate;
 			weightsOutputGate[j][full_input_dimension-1] += biasOutputGate;
@@ -96,8 +89,7 @@ public class LSTM implements IAgent, IAgentSupervised
 		peepForgetGate = new double[cell_blocks];
 		peepOutputGate = new double[cell_blocks];
 		
-		for (int j = 0; j < cell_blocks; j++)
-		{
+		for (int j = 0; j < cell_blocks; j++) {
 			peepInputGate[j] = (r.nextDouble() * 2 - 1) * init_weight_range;
 			peepForgetGate[j] = (r.nextDouble() * 2 - 1) * init_weight_range;
 			peepOutputGate[j] = (r.nextDouble() * 2 - 1) * init_weight_range;
@@ -105,16 +97,14 @@ public class LSTM implements IAgent, IAgentSupervised
 		
 		weightsGlobalOutput = new double[output_dimension][full_hidden_dimension];
 		
-		for (int j = 0; j < full_hidden_dimension; j++)
-		{
+		for (int j = 0; j < full_hidden_dimension; j++) {
 			for (int k = 0; k < output_dimension; k++)
 				weightsGlobalOutput[k][j] = (r.nextDouble() * 2 - 1) * init_weight_range;
 		}
 		
 	}
 	
-	public void Reset()
-	{
+	public void Reset() {
 		//TODO: reset deltas here?
 		for (int c = 0; c < CEC.length; c++)
 			CEC[c] = 0.0;
@@ -136,21 +126,17 @@ public class LSTM implements IAgent, IAgentSupervised
 	
 	
 	
-	public void Display()
-	{
+	public void Display() {
 		System.out.println("==============================");
 		System.out.println("LSTM: todo...");
 		System.out.println("\n==============================");
 	}
 	
-	public double[] GetParameters()
-	{
+	public double[] GetParameters() {
 		double[] params = new double[(full_input_dimension) * cell_blocks * 4 + 3 * cell_blocks + full_hidden_dimension * output_dimension];
 		int loc = 0;
-		for (int j = 0; j < cell_blocks; j++)
-		{
-			for (int i = 0; i < full_input_dimension; i++)
-			{
+		for (int j = 0; j < cell_blocks; j++) {
+			for (int i = 0; i < full_input_dimension; i++) {
 				params[loc++] = weightsNetInput[j][i];
 				params[loc++] = weightsInputGate[j][i];
 				params[loc++] = weightsForgetGate[j][i];
@@ -161,8 +147,7 @@ public class LSTM implements IAgent, IAgentSupervised
 			params[loc++] = peepOutputGate[j];
 		}
 		
-		for (int j = 0; j < full_hidden_dimension; j++)
-		{
+		for (int j = 0; j < full_hidden_dimension; j++) {
 			for (int k = 0; k < output_dimension; k++)
 				params[loc++] = weightsGlobalOutput[k][j];
 		}
@@ -171,13 +156,10 @@ public class LSTM implements IAgent, IAgentSupervised
 		return params;
 	}
 	
-	public void SetParameters(double[] params)
-	{
+	public void SetParameters(double[] params) {
 		int loc = 0;
-		for (int j = 0; j < cell_blocks; j++)
-		{
-			for (int i = 0; i < full_input_dimension; i++)
-			{
+		for (int j = 0; j < cell_blocks; j++) {
+			for (int i = 0; i < full_input_dimension; i++) {
 				weightsNetInput[j][i] = params[loc++];
 				weightsInputGate[j][i] = params[loc++];
 				weightsForgetGate[j][i] = params[loc++];
@@ -188,8 +170,7 @@ public class LSTM implements IAgent, IAgentSupervised
 			peepOutputGate[j] = params[loc++];
 		}
 		
-		for (int j = 0; j < full_hidden_dimension; j++)
-		{
+		for (int j = 0; j < full_hidden_dimension; j++) {
 			for (int k = 0; k < output_dimension; k++)
 				weightsGlobalOutput[k][j] = params[loc++];
 		}
@@ -197,8 +178,7 @@ public class LSTM implements IAgent, IAgentSupervised
 			System.out.println("ERROR in LSTM.SetParameters() " + loc + " vs " + params.length);
 	}
 	
-	public int GetHiddenDimension()
-	{
+	public int GetHiddenDimension() {
 		return cell_blocks;
 	}
 
@@ -229,10 +209,8 @@ public class LSTM implements IAgent, IAgentSupervised
 		double[] NetOutputAct = new double[cell_blocks];
 		
 		//inputs to cell blocks
-		for (int i = 0; i < full_input_dimension; i++)
-		{
-			for (int j = 0; j < cell_blocks; j++)
-			{
+		for (int i = 0; i < full_input_dimension; i++) {
+			for (int j = 0; j < cell_blocks; j++) {
 				NetInputSum[j] += weightsNetInput[j][i] * full_input[i];
 				InputGateSum[j] += weightsInputGate[j][i] * full_input[i];
 				ForgetGateSum[j] += weightsForgetGate[j][i] * full_input[i];
@@ -245,8 +223,7 @@ public class LSTM implements IAgent, IAgentSupervised
 		double[] CEC3 = new double[cell_blocks];
 		
 		//internals of cell blocks
-		for (int j = 0; j < cell_blocks; j++)
-		{
+		for (int j = 0; j < cell_blocks; j++) {
 			CEC1[j] = CEC[j];
 			
 			NetInputAct[j] = neuronNetInput.Activate(NetInputSum[j]);
@@ -278,8 +255,7 @@ public class LSTM implements IAgent, IAgentSupervised
 		
 		//calculate output
 		double[] output = new double[output_dimension];
-		for (int k = 0; k < output_dimension; k++)
-		{
+		for (int k = 0; k < output_dimension; k++) {
 			for (int j = 0; j < full_hidden_dimension; j++)
 				output[k] += weightsGlobalOutput[k][j] * full_hidden[j];
 			//output not squashed
